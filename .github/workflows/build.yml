@@ -1,0 +1,23 @@
+name: Compilar Rueda de Python para aarch64
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+    - name: Compilar rueda para aarch64
+      - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.9' # Puedes ajustar la versión de Python si es necesario
+    - name: Build wheel for aarch64
+      run: |
+        # Usar una imagen Docker multi-arquitectura para compilar para aarch64
+        docker run --platform linux/aarch64 --rm -v "/data/data/com.termux/files/home/cloud_build_pandas":/src -w /src python:3.9-slim-bullseye /bin/bash -c "pip install wheel && pip wheel -w /src/wheelhouse -r /src/requirements.txt"
+    - name: Subir artefacto
+      uses: actions/upload-artifact@v4
+      with:
+        name: python-wheels
+        path: target/wheels
